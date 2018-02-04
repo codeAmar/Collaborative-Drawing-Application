@@ -3,3 +3,19 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  .colors
+    .black.color-pallet
+    .red.color-pallet
+    .green.color-pallet
+    .blue.color-pallet
+    .pink.color-pallet
+  .tools
+    .pen.tool-pallet
+    .brush.tool-pallet
+    .line.tool-pallet
+    .triangle.tool-pallet
+    .circle.tool-pallet
+    .rectangle.tool-pallet 
+    .hand.tool-pallet    
+  canvas( id="draw", resize="true", keepalive="true" )
+  script( type="text/paperscript", src="javascripts/draw1.js", canvas="draw")

@@ -6,3 +6,26 @@ body {
 a {
   color: #00B7FF;
 }
+
+#draw{
+  width: 900px;
+  height: 680px;
+}
+
+.color-pallet {
+  width: 50px;
+  background-color: blue;
+  height: 50px;
+}
+
+.tool-pallet{
+  width: 50px;
+  background-color: blue;
+  height: 50px;
+}
+
+.colors , .tools{
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}

@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+// var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -9,6 +9,11 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,6 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', index);
 app.use('/users', users);
@@ -43,4 +49,43 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+
+io.sockets.on('connection', function (socket) {
+  
+  // (2): The server recieves a ping event
+  // from the browser on this socket
+  socket.on('ping', function ( data ) {
+  
+    console.log('socket: server recieves ping (2)');
+
+    // (3): Emit a pong event all listening browsers
+    // with the data from the ping event
+    io.sockets.emit( 'pong', data );   
+    
+    console.log('socket: server sends pong to all (3)');
+
+  });
+
+  socket.on( 'drawLine', function( data ) {
+    socket.broadcast.emit( 'drawLine', data );
+  });
+
+  socket.on('drawRect', function(data){
+    socket.broadcast.emit('drawRect',data);
+  });
+
+  socket.on('drawCir', function(data){
+    socket.broadcast.emit('drawCir',data);
+  });
+
+  socket.on('drawBrush',function(data){
+    socket.broadcast.emit('drawBrush',data);
+  });
+
+});
+
+
+module.exports = {
+  app:app,
+  http:http
+}
