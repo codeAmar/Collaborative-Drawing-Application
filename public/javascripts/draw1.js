@@ -4,8 +4,13 @@ var rectangle, triangle, circle, pen;
 var rectangleDrawn = false;
 var isPenDrawing = false;
 var isBrushDrawing = false;
+var cpyarr;
+var initialPointPenCopy;
+
 var colors = document.querySelectorAll('div.color-pallet');
 var tools = document.querySelectorAll('div.tool-pallet');
+
+
 
 var current = {
     color: 'black',
@@ -74,10 +79,7 @@ function onMouseDown(event) {
             break;
         case 'brush':
             initialPointBrush = new Path();
-            initialPointBrush.fillColor = current.color;
-            initialPointBrush.add(event.point);
-            console.log('brush path mouse pressed positions' + initialPointBrush.position);
-            isBrushDrawing = true;
+            mouseDownDrawBrush(initialPointBrush);
             break;
         default:
             console.log('unknown switch statement');
@@ -85,26 +87,15 @@ function onMouseDown(event) {
     }
 }
 
-
 function onMouseDrag(event) {
     if (isPenDrawing) {
         initialPointPen.add(event.point);
     }
     if (isBrushDrawing) {
-
-        console.log('brush path drag positions' + initialPointBrush.position);
-        
-        var step = event.delta / 2;
-        step.angle += 90;
-
-        var top = event.middlePoint + step;
-        var bottom = event.middlePoint - step;
-
-        initialPointBrush.add(top);
-        initialPointBrush.insert(0, bottom);
-        initialPointBrush.smooth();
+        mouseDragDrawBrush(event);
     }
 }
+
 
 
 function onMouseUp(event) {
@@ -143,15 +134,16 @@ function onMouseUp(event) {
             break;
         case 'pen':
             isPenDrawing = false;
-            console.log('mouse released from pen');
+            initialPointPenCopy = Object.assign({},initialPointPen);
+            console.log('mouse released from pen' + Object.keys(initialPointPenCopy) );
+            console.log('initial pen data ' + Object.keys(initialPointPen));
+            emitPen(initialPointPenCopy);
             break;
         case 'brush':
             isBrushDrawing = false;
-            initialPointBrush.add(event.point);
-            initialPointBrush.closed = true;
-            initialPointBrush.smooth();
-            console.log('brush path mouse up positions' + initialPointBrush.position);
-            emitBrush(initialPointBrush);
+            MouseUpDrawBrush(event);
+            // var copy = initialPointBrush.clone();
+            // copy.position = new Point(100, 100);
             break;
         default:
             console.log('unknown switch statement');
@@ -173,6 +165,40 @@ function onMouseUp(event) {
 }
 
 
+
+function mouseDownDrawBrush(initialPointBrush) {
+    initialPointBrush.fillColor = current.color;
+    initialPointBrush.add(event.point);
+    console.log('brush path mouse pressed positions' + initialPointBrush.position);
+    isBrushDrawing = true;
+}
+
+function mouseDragDrawBrush(event) {
+    console.log('brush path drag positions' + initialPointBrush.position);
+
+    var step = event.delta / 2;
+    step.angle += 90;
+
+    var top = event.middlePoint + step;
+    var bottom = event.middlePoint - step;
+
+    initialPointBrush.add(top);
+    initialPointBrush.insert(0, bottom);
+    initialPointBrush.smooth();
+}
+
+
+function MouseUpDrawBrush(event) {
+    initialPointBrush.add(event.point);
+    initialPointBrush.closed = true;
+    initialPointBrush.smooth();
+    console.log('brush path mouse up positions' + initialPointBrush);
+    console.log(initialPointBrush._segments[0]._point._x);
+    cpyarr = Object.assign({}, initialPointBrush);
+    console.log(cpyarr);
+    emitBrush(cpyarr);
+
+}
 
 
 
@@ -204,9 +230,16 @@ function emitCir(points, size) {
     io.emit('drawCir', data);
 }
 
-function emitBrush(path){
-    io.emit('drawBrush',path);
+function emitBrush(path) {
+    io.emit('drawBrush', path);
 }
+
+function emitPen(path){
+    console.log('emit pen '+ path);
+    io.emit('drawPen',path);
+}
+
+
 
 io.on('drawLine', function (data) {
     var myPath = new Path();
@@ -230,6 +263,20 @@ io.on('drawCir', function (data) {
     myCircle.fillColor = current.color;
 })
 
-io.on('drawBrush', function (data) {
-    var brushClone = data.clone();    
+io.on('drawBrush', function (path) {
+    view.draw();
+
+    var brushClone = new Path(path._segments);
+    brushClone.fillColor = current.color;
+    console.log(brushClone)
+    view.draw();
+    // brushClone.fillColor= 'red';
+    // console.log('draw brush event recieved',brushClone);   
+})
+
+io.on('drawPen', function(path){
+    console.log(path);
+    // var myPenClone = path.clone();
+    // console.log('mypen clone '+ myPenClone);
+    view.draw();
 })

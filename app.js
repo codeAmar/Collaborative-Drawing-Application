@@ -78,10 +78,13 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('drawCir',data);
   });
 
-  socket.on('drawBrush',function(data){
-    socket.broadcast.emit('drawBrush',data);
+  socket.on('drawBrush',function(path){
+    socket.broadcast.emit('drawBrush',path);
   });
 
+  socket.on('drawPen',function(path){
+    socket.broadcast.emit('drawPen',path);
+  });
 });
 
 
