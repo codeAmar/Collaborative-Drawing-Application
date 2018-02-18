@@ -23,7 +23,9 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -31,61 +33,64 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
 
 io.sockets.on('connection', function (socket) {
-  
-  // (2): The server recieves a ping event
-  // from the browser on this socket
-  socket.on('ping', function ( data ) {
-  
+
+  socket.on('ping', function (data) {
+
     console.log('socket: server recieves ping (2)');
 
-    // (3): Emit a pong event all listening browsers
-    // with the data from the ping event
-    io.sockets.emit( 'pong', data );   
-    
+    io.sockets.emit('pong', data);
+
     console.log('socket: server sends pong to all (3)');
 
   });
 
-  socket.on( 'drawLine', function( data ) {
-    socket.broadcast.emit( 'drawLine', data );
+  socket.on('drawLine', function (data) {
+    socket.broadcast.emit('drawLine', data);
   });
 
-  socket.on('drawRect', function(data){
-    socket.broadcast.emit('drawRect',data);
+  socket.on('drawRect', function (data) {
+    socket.broadcast.emit('drawRect', data);
   });
 
-  socket.on('drawCir', function(data){
-    socket.broadcast.emit('drawCir',data);
+  socket.on('drawCir', function (data) {
+    socket.broadcast.emit('drawCir', data);
   });
 
-  socket.on('drawBrush',function(data){
-    socket.broadcast.emit('drawBrush',data);
+  socket.on('drawTri', function (data) {
+    socket.broadcast.emit('drawTri', data);
   });
+
+
+  socket.on('drawBrushs', function (path) {
+    socket.broadcast.emit('drawBrushs', path);
+  });
+
+
+  socket.on('drawPens', function (path) {
+    socket.broadcast.emit('drawPens', path);
+  });
+
 
 });
 
 
 module.exports = {
-  app:app,
-  http:http
+  app: app,
+  http: http
 }
