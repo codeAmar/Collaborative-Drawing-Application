@@ -24,6 +24,12 @@ a {
   height: 50px;
 }
 
+.clear,.undo,.select{
+  width: 60px;
+  height: 60px;
+  background-color: green;
+}
+
 .colors , .tools{
   display: flex;
   flex-wrap: nowrap;
