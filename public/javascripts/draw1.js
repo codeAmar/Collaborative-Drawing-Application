@@ -12,6 +12,9 @@ var brushPathObj = {};
 
 var colors = document.querySelectorAll('div.color-pallet');
 var tools = document.querySelectorAll('div.tool-pallet');
+// var clear = document.querySelectorAll('div.clear');
+// var undo = document.querySelectorAll('div.undo');
+// var select = document.querySelectorAll('div.select');
 
 tool.minDistance = 10;
 tool.maxDistance = 45;
@@ -45,10 +48,39 @@ tools.forEach(function (element) {
             current.tool = event.target.className.split(' ')[0];
             console.log(current.tool);
         }
+        if (current.tool === 'select') {
+            console.log('Select clicked');
+            project.activeLayer.lastChild.selected = true;
+        }
+        if (current.tool === 'clear') {
+            console.log('clear clicked');
+            project.activeLayer.removeChildren();
+            view.draw();
+        }
+        if (current.tool === 'undo') {
+            console.log('undo clicked');
+            project.activeLayer.lastChild.remove();
+            view.draw();
+        }
     });
+
 });
 
 
+
+// clear[0].addEventListener('click', function (event) {
+// });
+
+// undo[0].addEventListener('click', function (event) {
+// });
+
+// select[0].addEventListener('click', function (event) {
+//     if (event.type === 'click') {
+//         console.log('select clicked');
+//         project.activeLayer.lastChild.selected = true;
+//         view.draw();
+//     }
+// });
 
 function randomColor() {
     return {
@@ -76,10 +108,10 @@ function onMouseDown(event) {
             console.log('initial rect point ' + initialPointRect);
             break;
         case 'triangle':
-            initialPointTri = new Point(event.point);
+            console.log('triangle mouse down event occured');
             break;
         case 'circle':
-            initialPointCir = new Point(event.point);
+            console.log('circle mouse down event occured');
             break;
         case 'pen':
             initialPointPen = new Path();
@@ -99,17 +131,24 @@ function onMouseDown(event) {
             mouseDownDrawBrush(initialPointBrush, event);
             break;
         default:
-            console.log('unknown switch statement');
+            console.log('unknown mouse down switch statement');
             break;
     }
 }
-
+// var dragging = true;
 function onMouseDrag(event) {
     if (isPenDrawing) {
         mouseDragDrawPen(event);
     }
     if (isBrushDrawing) {
         mouseDragDrawBrush(event);
+    }
+    if (current.tool === 'select') {
+        console.log('dragging select tooll');
+        paper.project.activeLayer.lastChild.position = event.point;
+    }
+    if (current.tool === 'hand') {
+        console.log('dragging hand tooll');
     }
 }
 
@@ -144,22 +183,26 @@ function onMouseUp(event) {
             rectPath = new Rectangle(initialPointRect, rectangleSize);
             rectangle = new Path.Rectangle(rectPath);
             rectangle.fillColor = current.color;
-            rectangle.selected = true;
+            rectangle.selected = false;
             rectangleDrawn = true;
             emitRect(initialPointRect, rectangleSize);
             console.log('rectangle layer' + rectangle.layer);
             break;
         case 'triangle':
-            triangle = new Path.RegularPolygon(initialPointTri, 3, intialSizeTri);
+            triangle = new Path.RegularPolygon(event.downPoint, 3, event.delta.length);
             triangle.fillColor = current.color;
-            triangle.selected = true;
-            emitTri(initialPointTri, 3, intialSizeTri);
+            triangle.selected = false;
+            emitTri(event.downPoint, 3, event.delta.length);
             break;
         case 'circle':
-            circle = new Path.Circle(initialPointCir, 60);
+            circle = new Path.Circle({
+                center: event.downPoint,
+                radius: event.delta.length
+            });
             circle.strokeColor = 'black';
             circle.fillColor = current.color;
-            emitCir(initialPointCir, 60);
+            circle.selected = false;
+            emitCir(event.downPoint, event.delta.length);
             break;
         case 'pen':
             mouseUpDrawPen(event);
@@ -168,8 +211,20 @@ function onMouseUp(event) {
             isBrushDrawing = false;
             MouseUpDrawBrush(event);
             break;
+        case 'hand':
+            var finalSize = 1 ;
+            if(((event.delta.x + event.delta.y) / 50) < 1 ){
+                finalSize = finalSize + (((event.delta.x + event.delta.y)*100) % .75);
+            }
+            else if(((event.delta.x + event.delta.y) / 50) >= 1){
+                finalSize = finalSize - (((event.delta.x + event.delta.y)*100) % .75);
+            }
+            console.log('delta', ((event.delta.x + event.delta.y )*100) % .75 );
+            console.log('final size ', finalSize);
+            paper.project.activeLayer.lastChild.scale(finalSize);
+            break;
         default:
-            console.log('unknown switch statement');
+            console.log('unknown  mouseup switch statement');
             break;
     }
     if (rectangleDrawn) {
@@ -275,16 +330,15 @@ function emitRect(points, size) {
 
 function emitCir(points, size) {
     var data = {
-        x: points.x,
-        y: points.y,
-        size: size
-    }
+        "middlePoint": points,
+        "size": size
+    };
     io.emit('drawCir', data);
 }
 
 function emitTri(points, corners, size) {
     var data = {
-        points: points,
+        middlePoint: points,
         corners: corners,
         size: size
     }
@@ -320,15 +374,16 @@ io.on('drawRect', function (data) {
 })
 
 io.on('drawCir', function (data) {
-    var myCircle = new Path.Circle(new Point(data.x, data.y), data.size);
+    var myCircle = new Path.Circle(new Point(data.middlePoint[1], data.middlePoint[2]), data.size);
     myCircle.fillColor = current.color;
+    view.draw();
 })
 
 io.on('drawTri', function (data) {
     console.log('data recieved : ', data);
-    var emittedTriangle = new Path.RegularPolygon(new Point(data.points[1], data.points[2]), data.corners, data.size);
+    var emittedTriangle = new Path.RegularPolygon(new Point(data.middlePoint[1], data.middlePoint[2]), data.corners, data.size);
     emittedTriangle.fillColor = current.color;
-    emittedTriangle.selected = true;
+    emittedTriangle.selected = false;
     console.log('emitted triangle  : ', emittedTriangle);
     view.draw();
 })
