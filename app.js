@@ -7,13 +7,16 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var drawingPortal = require('./routes/drawingPortal');
 
 var app = express();
+
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-
+var allusers = [];
+var allsocketobjects = [];
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,6 +35,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/drawing', drawingPortal);
+
 
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
@@ -85,6 +90,66 @@ io.sockets.on('connection', function (socket) {
   socket.on('drawPens', function (path) {
     socket.broadcast.emit('drawPens', path);
   });
+
+
+
+
+
+
+  socket.on('chat message', function (msg) {
+    console.log('chat message');
+    io.emit('chat message', socket.username, msg);
+  });
+
+
+  socket.on('username', function (user) {
+    socket.username = user;
+    console.log('username');
+    allusers.push(socket.username);
+    allsocketobjects.push(socket);
+    console.log('allusers', allusers);
+    console.log('allsocketobjects', allsocketobjects);
+    io.emit('allusers', allusers);
+    socket.emit('username', "Hi " + user + "! You are connected!");
+    socket.broadcast.emit('guest connected', user + " has entered the chat room");
+  });
+
+  socket.on('private_request', function (sender, receiver) {
+    console.log('private request', receiver);
+    var receiver_id;
+    for (var i = 0; i < allusers.length; i++) {
+      if (allsocketobjects[i].username == receiver) {
+        receiver_id = allsocketobjects[i].id;
+      }
+    }
+    socket.broadcast.to(receiver_id).emit('private_request_received', this.username , " wants to draw with you. Click to start drawing together! ");
+  });
+
+  socket.on('joined room', function (username,receiver) {
+    var receiver_id;
+    for (var i = 0; i < allusers.length; i++) {
+      if (allsocketobjects[i].username == receiver) {
+        receiver_id = allsocketobjects[i].id;
+      }
+    }
+    socket.broadcast.to(receiver_id).emit('join drawing',username);
+  });
+
+
+  socket.on('disconnect', function () {
+    console.log('disconnect');
+    if (socket.username == undefined) {} else {
+      var name = socket.username;
+      socket.broadcast.emit('guest disconnected', name + " has left the chat room");
+      var index = allusers.indexOf(name);
+      if (index > -1) {
+        allusers.splice(index, 1);
+        allsocketobjects.splice(index, 1);
+      }
+      io.emit('allusers', allusers);
+    }
+  });
+
 
 
 });

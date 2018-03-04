@@ -35,3 +35,236 @@ a {
   flex-wrap: nowrap;
   justify-content: center;
 }
+
+
+
+
+
+
+/* akshil styles */
+
+@import url('https://fonts.googleapis.com/css?family=Alegreya|Crimson+Text|Playfair+Display|Raleway');
+
+.master{
+  display: flex;
+  flex-direction: row;
+  background-image: url('/images/bluemountain.jpg');
+  background-position: center;
+  background-size: cover;
+}
+
+#contentwrap{
+  width: 80vw;
+}
+
+#partition2{
+  width: 20vw;
+  display: none;
+  margin: 1rem 1rem;
+  height: 80vh;
+  /* border-left: 1px solid rgba(0,0,0,0.3); */
+  padding: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  background-color: rgba(0,0,0,0.2);
+}
+
+#partition2 p{
+  font-size:.95rem;
+  margin-bottom: 1.5rem;
+}
+
+#partition2 h3{
+  font-weight: 100;
+}
+
+#allusers ul 
+{
+  list-style-type: none !important; 
+} 
+
+#allusers{
+  max-height: 85%;
+  overflow-y: auto;
+}
+
+#allusers::-webkit-scrollbar{
+  border-radius: 50px;
+  border: none;
+  background-color: rgba(0,0,0,0.1); 
+  margin-top: 1rem;
+}
+
+#allusers::-webkit-scrollbar-thumb{
+  border-radius: 50px;
+  border: none;
+  background-color:rgba(216, 215, 215,0.8); 
+}
+
+#allusers ul li{    
+  width: 70%; 
+  padding: 0.5rem 1rem;
+  border-bottom:  1px solid rgba(128,128,128,0.5);
+  cursor: pointer;
+  transition: .5s all;
+}
+
+#allusers ul li:hover{
+  display: flex;
+  transition: .5s all;
+  background-color: rgba(232, 232, 232, 0.6);
+}
+
+.username{
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  border-radius:5px;
+  top:30%;
+  left:40%; 
+  height: 30%;
+  background-color: rgba(0,0,0,0);
+  box-shadow: inset 0px 2px 300px 0px rgba(0,0,0,0.30);
+}
+
+.username button{
+  border:none;
+  padding:.5rem;
+  border-radius:5px;
+  transition: 1s all;
+  background-color: white;  
+}
+
+.username input{
+  border-radius:7px;
+  padding: .5rem;
+  border:none;
+}
+ .username button:hover{
+    background-color: #55CC2C; 
+    transition: 1s all;
+}
+ .username button:focus{
+    background-color: #55CC2C; 
+    transition: 1s all;
+}
+
+.username *{
+    margin:.5rem;
+}
+
+  #messages { 
+    list-style-type: none; 
+    font-family: 'Alegreya', serif;
+  }
+
+  #messages li a{
+    text-decoration: none;
+    color: black;
+  }
+
+  #messages li { 
+    margin: 1rem;
+    padding: 5px 1rem;
+    background:rgba(0,0,0,0.4); 
+    font-size: 1.2rem;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    width: 30% !important;
+    word-wrap: break-word;
+    height: auto;
+  }
+
+  #messages li:nth-child(odd) { 
+    width: auto;  
+  }
+
+  #messages li:first-of-type{
+      background-color: rgba(85, 204, 44,0.8);  
+  }
+
+  #chatting{
+    position: fixed;
+    bottom:1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    width: 100%;
+    margin-left: 1rem;
+    align-content: center;
+    align-items: center;
+  }
+
+  #chatting input{
+    height: 3rem;
+    width: 72vw;
+    margin:0;
+    padding: 0rem 1rem;
+    font-size: 1.2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.3);
+  }
+
+  #chatting button{
+    width: 10vw;
+    height: 3rem;
+    border: none;
+    margin-left: 1rem;
+    border-radius: 20px;
+    background-color:#55CC2C; 
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+  }
+
+  #logo img{
+    height: 10rem;
+    width: auto;
+  }
+
+  #logo{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    /* margin-left: 2.5rem; */
+    width: 100%;
+  } 
+
+  #warning{
+    height: 1.5rem;
+    width: auto;
+    margin-left: .5rem;
+    display: none;
+  }
+
+  .typewarning{
+    display: none;
+    position: absolute;
+    border-radius: 50px;
+    background-color: white;
+    padding: .3rem;
+  }
+
+  .overflow{
+    max-height: 80vh;
+    overflow-y: auto;
+    margin-top: .5rem;
+  }
+
+  .overflow::-webkit-scrollbar{
+    border-radius: 50px;
+    border: none;
+    background-color: rgba(0,0,0,0.1); 
+  }
+
+  .overflow::-webkit-scrollbar-thumb{
+    border-radius: 50px;
+    border: none;
+    background-color:rgba(216, 215, 215,0.8); 
+  }
