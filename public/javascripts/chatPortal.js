@@ -67,7 +67,7 @@ $(function () {
     });
 
     socket.on('join drawing',function(username){
-      $('#messages').append($('<li>' + '<a class="joined-room-link" href="/drawing">' + username + ' has joined drawing already ' + '</a>' + '</li>'));
+      $('#messages').append($('<li>' + '<a class="joined-room-link" href="/drawing">' + username + ' has joined drawing already, join him ' + '</a>' + '</li>'));
 
     });
 
