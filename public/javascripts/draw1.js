@@ -36,10 +36,11 @@ var emitted = {
 
 var current = {
     color: 'black',
-    tool: 'pen'
+    tool: 'pen',
+    cursor: 'default'
 };
 
-var mycursor = document.querySelector('#draw');
+var myCursor = document.querySelector('#draw');
 var colors = document.querySelectorAll('div.color-pallet');
 var tools = document.querySelectorAll('div.tool-pallet');
 // var clear = document.querySelectorAll('div.clear');
@@ -49,7 +50,11 @@ tool.minDistance = 10;
 tool.maxDistance = 45;
 
 
-
+myCursor.addEventListener("mouseover", function (event) {
+    myCursor.style.cursor = current.cursor;
+    console.log('mousess');
+    console.log('current cursor :', current.cursor);
+})
 
 
 // MISCELLANEOUS FUNCTIONS /////////////////////////////////////////
@@ -85,19 +90,41 @@ tools.forEach(function (element) {
         if (event.type === 'click') {
             current.tool = event.target.className.split(' ')[0];
             console.log(current.tool);
+            console.log('event target', event.target.className.split(' ')[0]);
+            switch (event.target.className.split(' ')[0]) {
+                case 'line':
+                case 'rectangle':
+                case 'triangle':
+                case 'circle':
+                case 'pen':
+                case 'brush':
+                    current.cursor = 'crosshair';
+                    break;
+                case 'default':
+                    break;
+
+            }
         }
         if (current.tool === 'select') {
             console.log('Select clicked');
+            current.cursor = 'move';
             project.activeLayer.lastChild.selected = true;
         }
         if (current.tool === 'clear') {
             console.log('clear clicked');
+            current.cursor = 'default';
             project.activeLayer.removeChildren();
             view.draw();
         }
         if (current.tool === 'undo') {
             console.log('undo clicked');
+            current.cursor = 'default';
             project.activeLayer.lastChild.remove();
+            view.draw();
+        }
+        if (current.tool === 'hand') {
+            console.log('hand clicked');
+            current.cursor = 'nwse-resize';
             view.draw();
         }
     });
@@ -159,7 +186,7 @@ function onMouseDown(event) {
                     "y": event.point.y
                 },
                 path: [],
-                color : current.color
+                color: current.color
             };
             break;
         case 'brush':
@@ -207,7 +234,7 @@ function onMouseUp(event) {
             console.log('shape.rectangle is : ', shape.Rectangle);
             rectangleSize = event.delta + shape.Rectangle;
             console.log('rectangleSize is : ', rectangleSize);
-            console.log('event.delta',event.delta);
+            console.log('event.delta', event.delta);
             rectPath = new Rectangle(shape.Rectangle, rectangleSize);
             rectangle = new Path.Rectangle(rectPath);
             rectangle.fillColor = current.color;
@@ -220,7 +247,7 @@ function onMouseUp(event) {
             shape.Triangle = new Path.RegularPolygon(event.downPoint, 3, event.delta.length);
             shape.Triangle.fillColor = current.color;
             shape.Triangle.selected = false;
-            emitTri(event.downPoint, 3, event.delta.length , current.color);
+            emitTri(event.downPoint, 3, event.delta.length, current.color);
             break;
         case 'circle':
             shape.Circle = new Path.Circle({
@@ -312,7 +339,7 @@ function mouseDownDrawBrush(event) {
         },
         events: [],
         end: {},
-        color : current.color
+        color: current.color
     };
 }
 
@@ -375,7 +402,7 @@ function emitRect(points, size, color) {
         y: points.y,
         width: size.x,
         height: size.y,
-        color : color
+        color: color
     };
     io.emit('drawRect', data);
 }
@@ -384,7 +411,7 @@ function emitCir(points, size, color) {
     var data = {
         "middlePoint": points,
         "size": size,
-        color : color
+        color: color
     };
     io.emit('drawCir', data);
 }
@@ -394,7 +421,7 @@ function emitTri(points, corners, size, color) {
         middlePoint: points,
         corners: corners,
         size: size,
-        color : color
+        color: color
     }
     io.emit('drawTri', data);
 }
