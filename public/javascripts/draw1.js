@@ -123,11 +123,6 @@ tools.forEach(function (element) {
 
 
 
-
-
-
-
-
 // SYSTEM MOUSE EVENTS //////////////////////////////////////////////
 
 function onMouseDown(event) {
@@ -153,7 +148,7 @@ function onMouseDown(event) {
             console.log('circle mouse down event occured');
             break;
         case 'pen':
-            // Pen = new Path();
+            shape.Pen = new Path();
             shape.Pen.strokeColor = current.color;
             shape.Pen.add(event.point);
             isDrawn.pen = true;
@@ -162,7 +157,8 @@ function onMouseDown(event) {
                     "x": event.point.x,
                     "y": event.point.y
                 },
-                path: []
+                path: [],
+                color : current.color
             };
             break;
         case 'brush':
@@ -193,8 +189,6 @@ function onMouseDrag(event) {
 
 
 
-
-
 function onMouseUp(event) {
     var rectangleSize, rectPath;
 
@@ -215,14 +209,14 @@ function onMouseUp(event) {
             rectangle.fillColor = current.color;
             rectangle.selected = false;
             isDrawn.rectangle = true;
-            emitRect(shape.Rectangle, rectangleSize);
+            emitRect(shape.Rectangle, rectangleSize, current.color);
             console.log('rectangle layer' + rectangle.layer);
             break;
         case 'triangle':
             shape.Triangle = new Path.RegularPolygon(event.downPoint, 3, event.delta.length);
             shape.Triangle.fillColor = current.color;
             shape.Triangle.selected = false;
-            emitTri(event.downPoint, 3, event.delta.length);
+            emitTri(event.downPoint, 3, event.delta.length , current.color);
             break;
         case 'circle':
             shape.Circle = new Path.Circle({
@@ -232,7 +226,7 @@ function onMouseUp(event) {
             shape.Circle.strokeColor = 'black';
             shape.Circle.fillColor = current.color;
             shape.Circle.selected = false;
-            emitCir(event.downPoint, event.delta.length);
+            emitCir(event.downPoint, event.delta.length, current.color);
             break;
         case 'pen':
             mouseUpDrawPen(event);
@@ -305,7 +299,6 @@ function mouseUpDrawPen(event) {
 function mouseDownDrawBrush(event) {
     console.log('start of brush ', shape.Brush);
     shape.Brush.fillColor = current.color;
-
     shape.Brush.add(event.point);
     console.log('brush path mouse pressed positions' + shape.Brush.position);
     isDrawn.brush = true;
@@ -315,7 +308,8 @@ function mouseDownDrawBrush(event) {
             "y": event.point.y
         },
         events: [],
-        end: {}
+        end: {},
+        color : current.color
     };
 }
 
@@ -372,29 +366,32 @@ function emitLine(x, y, color) {
     io.emit('drawLine', data);
 }
 
-function emitRect(points, size) {
+function emitRect(points, size, color) {
     var data = {
         x: points.x,
         y: points.y,
         width: size.x,
-        height: size.y
+        height: size.y,
+        color : color
     };
     io.emit('drawRect', data);
 }
 
-function emitCir(points, size) {
+function emitCir(points, size, color) {
     var data = {
         "middlePoint": points,
-        "size": size
+        "size": size,
+        color : color
     };
     io.emit('drawCir', data);
 }
 
-function emitTri(points, corners, size) {
+function emitTri(points, corners, size, color) {
     var data = {
         middlePoint: points,
         corners: corners,
-        size: size
+        size: size,
+        color : color
     }
     io.emit('drawTri', data);
 }
@@ -429,20 +426,20 @@ io.on('drawLine', function (data) {
 io.on('drawRect', function (data) {
     var myRectangle = new Rectangle(new Point(data.x, data.y), new Point(data.width, data.height));
     emitted.Rectangle = new Path.Rectangle(myRectangle);
-    emitted.Rectangle.fillColor = current.color;
+    emitted.Rectangle.fillColor = data.color;
     emitted.Rectangle.selected = true;
     view.draw();
 })
 
 io.on('drawCir', function (data) {
     emitted.Circle = new Path.Circle(new Point(data.middlePoint[1], data.middlePoint[2]), data.size);
-    emitted.Circle.fillColor = current.color;
+    emitted.Circle.fillColor = data.color;
     view.draw();
 })
 
 io.on('drawTri', function (data) {
     emitted.Triangle = new Path.RegularPolygon(new Point(data.middlePoint[1], data.middlePoint[2]), data.corners, data.size);
-    emitted.Triangle.fillColor = current.color;
+    emitted.Triangle.fillColor = data.color;
     emitted.Triangle.selected = false;
     console.log('emitted triangle  : ', emitted.Triangle);
     view.draw();
@@ -453,7 +450,7 @@ io.on('drawBrushs', function (paths) {
     var brushSegments = JSON.parse(paths);
     console.log(brushSegments);
     emitted.Brush = new Path();
-    emitted.Brush.fillColor = current.color;
+    emitted.Brush.fillColor = brushSegments.color;
     emitted.Brush.add(new Point(brushSegments.start.x, brushSegments.start.y));
     var brushDragPaths = brushSegments.events.forEach(function (element) {
         var segment_arr_top = element.top.slice(1);
@@ -474,7 +471,7 @@ io.on('drawPens', function (paths) {
     var paths = JSON.parse(paths);
     emitted.Pen = new Path();
     emitted.Pen.add(new Point(paths.start.x, paths.start.y));
-    emitted.Pen.strokeColor = current.color;
+    emitted.Pen.strokeColor = paths.color;
     console.log('paths', paths);
     var myresuolt = paths.path.forEach(function (item) {
         emitted.Pen.add(new Point(item.x, item.y));
