@@ -39,6 +39,7 @@ var current = {
     tool: 'pen'
 };
 
+var mycursor = document.querySelector('#draw');
 var colors = document.querySelectorAll('div.color-pallet');
 var tools = document.querySelectorAll('div.tool-pallet');
 // var clear = document.querySelectorAll('div.clear');
@@ -203,7 +204,10 @@ function onMouseUp(event) {
             break;
 
         case 'rectangle':
-            rectangleSize = (new Point(event.point)) - shape.Rectangle;
+            console.log('shape.rectangle is : ', shape.Rectangle);
+            rectangleSize = event.delta + shape.Rectangle;
+            console.log('rectangleSize is : ', rectangleSize);
+            console.log('event.delta',event.delta);
             rectPath = new Rectangle(shape.Rectangle, rectangleSize);
             rectangle = new Path.Rectangle(rectPath);
             rectangle.fillColor = current.color;
@@ -252,18 +256,17 @@ function onMouseUp(event) {
     }
     if (isDrawn.rectangle) {
         rectangle.onMouseEnter = function (event) {
-            this.fillColor = 'cyan';
+            // this.fillColor = 'cyan';
         }
         rectangle.onMouseLeave = function (event) {
-            this.fillColor = current.color;
+            // this.fillColor = current.color;
         }
         rectangle.onMouseDrag = function (event) {
-            rectangle.position += event.delta;
+            // rectangle.position += event.delta;
         }
     }
 
 }
-
 
 
 
