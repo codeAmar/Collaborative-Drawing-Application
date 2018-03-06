@@ -1,43 +1,84 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin:0px;
+  padding: 0px;
+}
+
+.container{
+  height: 100vh;
+  width: 100vw;
+  background-image: url('/images/bluemountain.jpg');
+  background-position: center;
+}
+.parent{
+  margin: 0% 10% 10% 10%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 a {
   color: #00B7FF;
 }
 
+img{
+  max-width: 100%;
+  height: auto;
+}
+
 #draw{
-  width: 900px;
-  height: 680px;
+  width: 500px;
+  height: 400px;
+  box-shadow: 1px 2px 23px 3px rgba(0,0,0,0.49);
+  margin: 5% 5%;
+  background-color: white;
+}
+
+.tool-pallet{
+  margin:.3rem;
+  height: 4rem;
+  width: 4rem;
 }
 
 .color-pallet {
   width: 50px;
-  background-color: blue;
   height: 50px;
+  border-radius: 50px;
+  margin: .45rem .3rem; 
 }
 
-.tool-pallet{
-  width: 50px;
-  background-color: blue;
-  height: 50px;
-}
 
-.clear,.undo,.select{
-  width: 60px;
-  height: 60px;
-  background-color: green;
-}
-
-.colors , .tools{
+.tools{
+  margin:5% 0 0 0;
+  height: 400px;
+  width: 120px;
+  padding: .5rem;
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  /* border: 2px solid rgba(85, 204, 44,1); */
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background-color: rgba(0,0,0,0.2);
 }
 
-
-
+.colors{
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  margin:5% 0 0 0;
+  padding: .3rem;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background-color: rgba(0,0,0,0.2);
+}
 
 
 
@@ -216,7 +257,7 @@ a {
     border: none;
     margin-left: 1rem;
     border-radius: 20px;
-    background-color:#55CC2C; 
+    background-color:rgb(85, 204, 44); 
     font-family: 'Raleway', sans-serif;
     font-size: 1rem;
   }

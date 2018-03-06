@@ -42,7 +42,7 @@ var current = {
 
 var myCursor = document.querySelector('#draw');
 var colors = document.querySelectorAll('div.color-pallet');
-var tools = document.querySelectorAll('div.tool-pallet');
+var tools = document.querySelectorAll('div.tool-pallet img');
 // var clear = document.querySelectorAll('div.clear');
 // var undo = document.querySelectorAll('div.undo');
 // var select = document.querySelectorAll('div.select');
@@ -100,7 +100,7 @@ tools.forEach(function (element) {
                 case 'brush':
                     current.cursor = 'crosshair';
                     break;
-                case 'default':
+                case 'default': 
                     break;
 
             }
