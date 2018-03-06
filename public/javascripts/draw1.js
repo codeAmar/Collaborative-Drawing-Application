@@ -157,17 +157,10 @@ function onMouseDown(event) {
     view.draw();
     switch (current.tool) {
         case 'line':
-            shape.Line = new Path();
-            shape.Line.strokeColor = current.color;
-            shape.Line.strokeWidth = 5;
-            line.pointX = event.point;
-            console.log('point x is ' + line.pointX + "event.point is " + event.point);
-            shape.Line.add(event.point);
+            mouseDownDrawLine(event);
             break;
         case 'rectangle':
-            shape.Rectangle = new Point(event.point);
-            console.log('event.point ' + event.point);
-            console.log('initial rect point ' + shape.Rectangle);
+            mouseDownDrawRectangle(event);
             break;
         case 'triangle':
             console.log('triangle mouse down event occured');
@@ -176,18 +169,7 @@ function onMouseDown(event) {
             console.log('circle mouse down event occured');
             break;
         case 'pen':
-            shape.Pen = new Path();
-            shape.Pen.strokeColor = current.color;
-            shape.Pen.add(event.point);
-            isDrawn.pen = true;
-            pathOf.pen = {
-                start: {
-                    "x": event.point.x,
-                    "y": event.point.y
-                },
-                path: [],
-                color: current.color
-            };
+            mouseDownDrawPen(event);
             break;
         case 'brush':
             shape.Brush = new Path();
@@ -223,41 +205,17 @@ function onMouseUp(event) {
     switch (current.tool) {
 
         case 'line':
-            line.pointY = event.point;
-            console.log("point y is " + line.pointY + "event.point is " + event.point);
-            shape.Line.add(event.point);
-            view.draw();
-            emitLine(line.pointX, line.pointY, current.color);
+            mouseUpDrawLine(event);
             break;
 
         case 'rectangle':
-            console.log('shape.rectangle is : ', shape.Rectangle);
-            rectangleSize = event.delta + shape.Rectangle;
-            console.log('rectangleSize is : ', rectangleSize);
-            console.log('event.delta', event.delta);
-            rectPath = new Rectangle(shape.Rectangle, rectangleSize);
-            rectangle = new Path.Rectangle(rectPath);
-            rectangle.fillColor = current.color;
-            rectangle.selected = false;
-            isDrawn.rectangle = true;
-            emitRect(shape.Rectangle, rectangleSize, current.color);
-            console.log('rectangle layer' + rectangle.layer);
+            mouseUpDrawRectangle(event);
             break;
         case 'triangle':
-            shape.Triangle = new Path.RegularPolygon(event.downPoint, 3, event.delta.length);
-            shape.Triangle.fillColor = current.color;
-            shape.Triangle.selected = false;
-            emitTri(event.downPoint, 3, event.delta.length, current.color);
+            mouseUpDrawtriangle(event);
             break;
         case 'circle':
-            shape.Circle = new Path.Circle({
-                center: event.downPoint,
-                radius: event.delta.length
-            });
-            shape.Circle.strokeColor = 'black';
-            shape.Circle.fillColor = current.color;
-            shape.Circle.selected = false;
-            emitCir(event.downPoint, event.delta.length, current.color);
+            mouseUpDrawCircle(event);
             break;
         case 'pen':
             mouseUpDrawPen(event);
@@ -267,15 +225,7 @@ function onMouseUp(event) {
             MouseUpDrawBrush(event);
             break;
         case 'hand':
-            var finalSize = 1;
-            if (((event.delta.x + event.delta.y) / 50) < 1) {
-                finalSize = finalSize + (((event.delta.x + event.delta.y) * 100) % .75);
-            } else if (((event.delta.x + event.delta.y) / 50) >= 1) {
-                finalSize = finalSize - (((event.delta.x + event.delta.y) * 100) % .75);
-            }
-            console.log('delta', ((event.delta.x + event.delta.y) * 100) % .75);
-            console.log('final size ', finalSize);
-            paper.project.activeLayer.lastChild.scale(finalSize);
+            mouseUpDrawHand(event);
             break;
         default:
             console.log('unknown  mouseup switch statement');
@@ -300,31 +250,9 @@ function onMouseUp(event) {
 
 // CUSTOM MOUSE EVENTS FUNCTIONS //////////////////////////////////////////// 
 
-function mouseDragDrawPen(event) {
-    console.log('event.point mousedrag ', event.point.x, event.point.y);
-    shape.Pen.add(event.point);
-    pathOf.pen.path.push({
-        x: event.point.x,
-        y: event.point.y
-    });
-}
 
 
-function mouseUpDrawPen(event) {
-    isDrawn.pen = false;
-    shape.Pen.add(event.point);
-    shape.Pen.closed = false;
-    shape.Pen.smooth();
-    console.log('whole pen path ', shape.Pen);
-    pathOf.pen.end = {
-        "x": event.point.x,
-        "y": event.point.y
-    };
-    io.emit('drawPens', JSON.stringify(pathOf.pen));
-    pathOf.pen.path = new Array();
-}
-
-
+// MOUSE DOWN EVENTS/////////////
 
 function mouseDownDrawBrush(event) {
     console.log('start of brush ', shape.Brush);
@@ -343,6 +271,49 @@ function mouseDownDrawBrush(event) {
     };
 }
 
+function mouseDownDrawLine(event) {
+    shape.Line = new Path();
+    shape.Line.strokeColor = current.color;
+    shape.Line.strokeWidth = 5;
+    line.pointX = event.point;
+    console.log('point x is ' + line.pointX + "event.point is " + event.point);
+    shape.Line.add(event.point);
+}
+
+function mouseDownDrawRectangle(event) {
+    shape.Rectangle = new Point(event.point);
+    console.log('event.point ' + event.point);
+    console.log('initial rect point ' + shape.Rectangle);
+}
+
+function mouseDownDrawPen(event) {
+    shape.Pen = new Path();
+    shape.Pen.strokeColor = current.color;
+    shape.Pen.add(event.point);
+    isDrawn.pen = true;
+    pathOf.pen = {
+        start: {
+            "x": event.point.x,
+            "y": event.point.y
+        },
+        path: [],
+        color: current.color
+    };
+}
+
+
+
+// MOUSE DRAG EVENTS ///////////////////
+
+function mouseDragDrawPen(event) {
+    console.log('event.point mousedrag ', event.point.x, event.point.y);
+    shape.Pen.add(event.point);
+    pathOf.pen.path.push({
+        x: event.point.x,
+        y: event.point.y
+    });
+}
+
 function mouseDragDrawBrush(event) {
     var step = event.delta / 2;
     step.angle += 90;
@@ -357,6 +328,77 @@ function mouseDragDrawBrush(event) {
         "bottom": bottom,
     });
 
+}
+
+
+// MOUSE UP EVENTS ////////////////////
+
+
+function mouseUpDrawLine(event) {
+    line.pointY = event.point;
+    console.log("point y is " + line.pointY + "event.point is " + event.point);
+    shape.Line.add(event.point);
+    view.draw();
+    emitLine(line.pointX, line.pointY, current.color);
+}
+
+function mouseUpDrawRectangle(event) {
+    console.log('shape.rectangle is : ', shape.Rectangle);
+    rectangleSize = event.delta + shape.Rectangle;
+    console.log('rectangleSize is : ', rectangleSize);
+    console.log('event.delta', event.delta);
+    rectPath = new Rectangle(shape.Rectangle, rectangleSize);
+    rectangle = new Path.Rectangle(rectPath);
+    rectangle.fillColor = current.color;
+    rectangle.selected = false;
+    isDrawn.rectangle = true;
+    emitRect(shape.Rectangle, rectangleSize, current.color);
+    console.log('rectangle layer' + rectangle.layer);
+}
+
+function mouseUpDrawtriangle(event) {
+    shape.Triangle = new Path.RegularPolygon(event.downPoint, 3, event.delta.length);
+    shape.Triangle.fillColor = current.color;
+    shape.Triangle.selected = false;
+    emitTri(event.downPoint, 3, event.delta.length, current.color);
+}
+
+function mouseUpDrawCircle(event) {
+    shape.Circle = new Path.Circle({
+        center: event.downPoint,
+        radius: event.delta.length
+    });
+    shape.Circle.strokeColor = 'black';
+    shape.Circle.fillColor = current.color;
+    shape.Circle.selected = false;
+    emitCir(event.downPoint, event.delta.length, current.color);
+}
+
+function mouseUpDrawHand(event) {
+    var finalSize = 1;
+    if (((event.delta.x + event.delta.y) / 50) < 1) {
+        finalSize = finalSize + (((event.delta.x + event.delta.y) * 100) % .75);
+    } else if (((event.delta.x + event.delta.y) / 50) >= 1) {
+        finalSize = finalSize - (((event.delta.x + event.delta.y) * 100) % .75);
+    }
+    console.log('delta', ((event.delta.x + event.delta.y) * 100) % .75);
+    console.log('final size ', finalSize);
+    paper.project.activeLayer.lastChild.scale(finalSize);
+}
+
+
+function mouseUpDrawPen(event) {
+    isDrawn.pen = false;
+    shape.Pen.add(event.point);
+    shape.Pen.closed = false;
+    shape.Pen.smooth();
+    console.log('whole pen path ', shape.Pen);
+    pathOf.pen.end = {
+        "x": event.point.x,
+        "y": event.point.y
+    };
+    io.emit('drawPens', JSON.stringify(pathOf.pen));
+    pathOf.pen.path = new Array();
 }
 
 
