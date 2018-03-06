@@ -101,6 +101,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('username', function (user) {
     socket.username = user;
     console.log('username');
+    console.log('socket data :',socket.id);
     allusers.push(socket.username);
     allsocketobjects.push(socket);
     console.log('allusers', allusers);

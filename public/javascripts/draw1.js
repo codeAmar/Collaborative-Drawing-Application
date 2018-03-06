@@ -66,6 +66,8 @@ var uid = (function () {
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }());
 
+console.log("uid :",uid);
+
 function randomColor() {
     return {
         red: 0,
