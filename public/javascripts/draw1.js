@@ -66,7 +66,7 @@ var uid = (function () {
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }());
 
-console.log("uid :",uid);
+console.log("uid :", uid);
 
 function randomColor() {
     return {
@@ -102,7 +102,7 @@ tools.forEach(function (element) {
                 case 'brush':
                     current.cursor = 'crosshair';
                     break;
-                case 'default': 
+                case 'default':
                     break;
 
             }
@@ -129,11 +129,75 @@ tools.forEach(function (element) {
             current.cursor = 'nwse-resize';
             view.draw();
         }
+        if (current.tool === 'png') {
+            console.log('png clicked');
+            current.cursor = 'default';
+            encodePNG();
+            view.draw();
+        }
+        if (current.tool === 'svg') {
+            console.log('svg clicked');
+            current.cursor = 'default';
+            var mysvg = paper.project.exportSVG();
+            encodeSVG(mysvg);
+            view.draw();
+        }
     });
 
 });
 
+function encodeSVG(svg) {
+    if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) {
+        svg.setAttribute('version', '1.1');
+        var dummy = document.createElement('div');
+        dummy.appendChild(svg);
+        window.winsvg = window.open('/static/html/export.html');
+        window.winsvg.document.write(dummy.innerHTML);
+        window.winsvg.document.body.style.margin = 0;
+    } else {
+        svg.setAttribute('version', '1.1');
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+        var dummy = document.createElement('div');
+        dummy.appendChild(svg);
+        var b64 = btoa(dummy.innerHTML);
+        var svghtml = "<img style='height:100%;width:100%;' src='data:image/svg+xml;base64," + b64 + "' />"
+        window.winsvg = window.open("", "SVG", "toolbar=yes,scrollbars=yes,resizable=yes,menubar=yes,titlebar=yes");
+        window.winsvg.document.write(svghtml);
+        var downloadSVG = window.winsvg.document.createElement('a');
+        downloadSVG.href = window.winsvg.document.getElementsByTagName('img')[0].getAttribute('src');
+        downloadSVG.setAttribute("style","text-align:left");
+        downloadSVG.download = 'image.svg';
+        var downloadLink = document.createTextNode('download');
+        downloadSVG.appendChild(downloadLink);
+        downloadSVG.click();
+        window.winsvg.document.body.appendChild(downloadSVG);
+        window.winsvg.document.body.style.margin = 0;
+    }
+}
 
+
+function encodePNG() {
+    var pngCanvas = document.getElementById('draw');
+    var pngHtml = "<img src='" + pngCanvas.toDataURL('image/png') + "' />"
+    if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) {
+        window.winpng = window.open('/static/html/export.html');
+        window.winpng.document.write(pngHtml);
+        window.winpng.document.body.style.margin = 0;
+    } else {
+        window.winpng = window.open("", "SVG", "toolbar=yes,scrollbars=yes,resizable=yes,menubar=yes,titlebar=yes");
+        window.winpng.document.write(pngHtml);
+        var downloadPNG = window.winpng.document.createElement('a');
+        downloadPNG.href = pngCanvas.toDataURL('image/png');
+        downloadPNG.setAttribute("style","text-align:left");
+        downloadPNG.download = 'image.png';
+        var downloadLink = document.createTextNode('');
+        downloadPNG.appendChild(downloadLink);
+        downloadPNG.click();
+        window.winpng.document.body.appendChild(downloadPNG);
+        window.winpng.document.body.style.margin = 0;
+    }
+}
 
 // clear[0].addEventListener('click', function (event) {
 // });

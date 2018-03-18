@@ -2,16 +2,16 @@ extends layout
 
 block content
   .container
-    .parent
-      .colors
-        .black.color-pallet
-        .red.color-pallet
-        .green.color-pallet
-        .blue.color-pallet
-        .pink.color-pallet
-        .purple.color-pallet
-        .yellow.color-pallet
-      canvas( id="draw", resize="true", keepalive="true" )
+      .colorscanvas
+        .colors
+          .black.color-pallet
+          .red.color-pallet
+          .green.color-pallet
+          .blue.color-pallet
+          .pink.color-pallet
+          .purple.color-pallet
+          .yellow.color-pallet
+        canvas( id="draw", resize="true", keepalive="true" )
       .tools
           .pen.tool-pallet
             img(src='/images/pen.svg',class='pen')
@@ -26,12 +26,15 @@ block content
           .rectangle.tool-pallet
             img(src='/images/rec.svg',class='rectangle') 
           .hand.tool-pallet  
-            img(src='/images/select.svg',class='hand')
+            img(src='/images/expand.svg',class='hand')
           .clear.tool-pallet
             img(src='/images/clear.svg',class='clear')
           .undo.tool-pallet
             img(src='/images/undo.svg',class='undo')
           .select.tool-pallet
             img(src='/images/select.svg',class='select')
-      
+          .select.tool-pallet
+            img(src='/images/svg.svg',class='svg')
+          .select.tool-pallet
+            img(src='/images/png.svg',class='png')
   script( type="text/paperscript", src="javascripts/draw1.js", canvas="draw")

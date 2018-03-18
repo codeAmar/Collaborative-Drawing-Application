@@ -71,7 +71,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('drawRect', function (data) {
     socket.broadcast.emit('drawRect', data);
-  });
+  }); 
 
   socket.on('drawCir', function (data) {
     socket.broadcast.emit('drawCir', data);
